@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset="utf-8">
+  <title>{{ ("Create new Translation") }}</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <!-- Handsontable CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@6.2.2/dist/handsontable.min.css">
+    <style>
+    /* Adjust the size of the Handsontable container */
+
+
+    /* Adjust the size of the Handsontable cells */
+    .htCore td {
+      font-size: 14px;
+      width: calc(5cm / 14 * 1em);
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container my-5">
+    <h1 class="mb-3">{{ ("New Translation form") }} </h1>
+    <br>
+    <a href="/proof">Need a proofreading?</a>
+    <form method="post">
+
+      <div class="form-group">
+        <label for="sourceText">{{ ("Source text:") }}</label>
+        <textarea class="form-control" name="sourceText" id="sourceText" rows="20" style="width: 100%;"></textarea>
+      </div>
+    <hr/><p>
+     <div class="form-group">
+        <label for="targetLanguage">{{ ("What language to translate into?") }}</label>
+        <select class="form-control" name="targetLanguage" id="targetLanguage"></select>
+      </div>
+      <hr/><p>
+      <div class="form-group">
+        <div id="checkbox-input">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="mtonly" id="mtonly" value="mtonly" >
+            <label class="form-check-label" for="mtonly">
+              {{ ("Machine Translate only") }}
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="nativesonly" id="nativesonly" value="nativesonly" checked>
+            <label class="form-check-label" for="nativesonly">
+              {{ ("Natives only") }}
+            </label>
+          </div>
+      </div>
+      <hr/><p>
+        <div class="form-group">
+				<label for="deadlineGroup">{{ ("New Translation form") }}Deadline:</label>
+				<div class="form-check form-check-inline">
+					<input class="form-check-input" type="radio" name="deadlineGroup" id="deadline1" value="1">
+					<label class="form-check-label" for="deadline1">
+						{{ ("1 hour") }}
+					</label>
+				</div>
+				<div class="form-check form-check-inline">
+					<input class="form-check-input" type="radio" name="deadlineGroup" id="deadline2" value="2">
+					<label class="form-check-label" for="deadline2">
+						{{ ("2 hours") }}
+					</label>
+				</div>
+				<div class="form-check form-check-inline">
+					<input class="form-check-input" type="radio" name="deadlineGroup" id="deadline3" value="3">
+					<label class="form-check-label" for="deadline3">
+						{{ ("3 hours") }}
+					</label>
+				</div>
+				<div class="form-check form-check-inline">
+					<input class="form-check-input" type="radio" name="deadlineGroup" id="deadline4" value="4">
+					<label class="form-check-label" for="deadline4">
+						{{ ("4 hours") }}
+					</label>
+				</div>
+			</div>
+      <hr/><p>
+      <div class="form-group">
+        <label for="spreadsheet-input">{{ ("Add your glossary:") }}</label>
+      <div id="spreadsheet-input"></div>
+        <input type="hidden" name="data" id="data">
+      </div>
+
+
+      <button type="submit" class="btn btn-primary">{{ ("Next") }}</button>
+    </form>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  <!-- Handsontable JS -->
+  <script src="https://cdn.jsdelivr.net/npm/handsontable@6.2.2/dist/handsontable.min.js"></script>
+  <script>
+
+var options = [
+      "German - deutsch - de",
+      "English - english - en",
+      "Russian - russki - ru",
+      // Add more options here
+    ];
+    // Dynamically generate the options and add them to the select field
+    var select = document.getElementById("targetLanguage");
+    for (var i = 0; i < options.length; i++) {
+      var option = document.createElement("option");
+      option.value = options[i];
+      option.text = options[i];
+      select.appendChild(option);
+    }
+
+    var container = document.getElementById('spreadsheet-input');
+
+    var hot = new Handsontable(container, {
+      data: [['', ''], ['', '']],
+      colHeaders: ['Source', '+ Target'],
+      rowHeaders: false,
+      minRows: 6,
+      minCols: 2,
+      colWidths: 200,
+      rowHeights: 25,
+      stretchH: 'all',
+      readOnly: false,
+      height: 200,
+      width: '100%',
+      manualColumnResize: true,
+      manualRowResize: true
+
+    });
+
+    document.querySelector('form').addEventListener('submit', function(event) {
+      var data = hot.getData();
+      document.getElementById('data').value = JSON.stringify(data);
+    });
+  </script>
+</body

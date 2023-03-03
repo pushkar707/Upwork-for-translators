@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .my-forms{
+        display: flex;
+        justify-content: space-around;
+        width: 90%;
+        margin: auto;
+    }
+    .my-form{
+        width: 30%;
+        background-color: #757575; /* rgb(188, 221, 223); */
+        padding: 30px;
+        margin: 30px auto;
+        border-radius: 15px;
+    }
+</style>
+<h3 class="text-center mb-3 mt-5">Change Password for {{user.email}}</h3>
+<div class="my-form">
+    <form method="POST">
+        {{changePassForm.hidden_tag()}}
+        <div class='mb-3'>
+            {{changePassForm.password.label(class='form-label')}}
+            {{changePassForm.password(class='form-control')}}
+        </div>
+        <div class='mb-3'>
+            {{changePassForm.pass_confirm.label(class='form-label')}}
+            {{changePassForm.pass_confirm(class='form-control')}}
+        </div>
+        {{changePassForm.submit(class='btn btn-primary')}}
+    </form>
+</div>
+{%endblock%}

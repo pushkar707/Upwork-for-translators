@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+<head>
+<meta name="viewport" content="width=device-width" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Client job Offer</title>
+<style type="text/css">
+img {
+max-width: 100%;
+}
+body {
+-webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6em;
+}
+body {
+background-color: #f6f6f6;
+}
+@media only screen and (max-width: 640px) {
+  body {
+    padding: 0 !important;
+  }
+  h1 {
+    font-weight: 800 !important; margin: 20px 0 5px !important;
+  }
+  h2 {
+    font-weight: 800 !important; margin: 20px 0 5px !important;
+  }
+  h3 {
+    font-weight: 800 !important; margin: 20px 0 5px !important;
+  }
+  h4 {
+    font-weight: 800 !important; margin: 20px 0 5px !important;
+  }
+  h1 {
+    font-size: 22px !important;
+  }
+  h2 {
+    font-size: 18px !important;
+  }
+  h3 {
+    font-size: 16px !important;
+  }
+  .container {
+    padding: 0 !important; width: 100% !important;
+  }
+  .content {
+    padding: 0 !important;
+  }
+  .content-wrap {
+    padding: 10px !important;
+  }
+  .invoice {
+    width: 100% !important;
+  }
+  .red {
+    color: red;
+  }
+}
+</style>
+</head>
+<body style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: none; width: 100% !important; height: 100%; line-height: 1.6em; background-color: #f6f6f6; margin: 0;" bgcolor="#2E303D">
+            <h2>Hello from us</h2> 
+            <p>Please translate <span style="text-decoration: line-through;">proofread </span> <span style="text-decoration: line-through;">MTPE </span> this text:</p>
+            <p>{{srcText}}</p>
+            <h3>Job details: </h3>
+            <table>
+              <tr>
+                <td>Client:</td>
+                <td>{{ currUserEmail }}</td>
+              </tr>
+              <tr>
+                <td>Translation:</td>
+                <td>{{ fromLang }} to {{ toLang }}</td>
+              </tr>
+              <tr>
+                <td>Price:</td>
+                <td>{{ siteCurrency }} {{ formPriceData }}</td>
+              </tr>
+              <tr>
+                <td>Total words:</td>
+                <td>{{ wordCount }}</td>
+              </tr>
+              <tr>
+                <td>Current time:</td>
+                <td><span class="red">{{ timeNow }} CET</span></td>
+              </tr>
+              <tr>
+                <td>Deadline:</td>
+                <td><span style="color: red;">{{ deadline }} CET</span></td>
+              </tr>
+            </table>
+            <div>
+            <h4>Client Glossary</h4>
+            <table>
+              <tbody>
+                {#{% for gp in glossaryPairs %}
+                  {% if gp | nonempty %}
+                <tr>
+                  <td>{{ gp }}</td>
+                </tr>
+                  {% endif %}
+                {% endfor %}#}
+              </tbody>
+            </table>
+            <br>
+            </div>
+            <p>
+            Click <a href="{{hrefString}}">here</a> to accept or reject the translation.
+            Please deliver on time. You will not get another chance! Scroll down for other languages
+            </p>
+</body>
+</html>

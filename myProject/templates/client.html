@@ -1,0 +1,560 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .my-forms{
+        display: flex;
+        justify-content: space-around;
+        width: 90%;
+        margin: auto;
+        
+    }
+    .register-form,.login-form{
+        width: 60%;
+        background-color: #757575; /* rgb(188, 221, 223); */
+        padding: 25px;
+        margin: 30px auto;
+        border-radius: 10px;
+    }
+    .table{
+        background-color: rgb(188, 221, 223)
+    }
+
+    .container {
+        margin: 5px;
+    }
+
+</style>
+{% if session['user'] != 'client' %}
+<div class="container">
+    <h3>Welcome Clients! </h3>
+    <!-- <a href="/translator" class="text-center" target="_blank">I am a translator</a> -->
+    <!-- FORGOT PASSWORD FORM -->
+    {% if session['page'] == 'forgot' %}    
+    <div class="register-form">
+        <h3 class="text-center mb-3">Reset Passord</h3>
+        <form method="POST">
+            {{forgotPassForm.hidden_tag()}}
+            <div class="mb-3">
+                {{forgotPassForm.email.label(class='form-label')}}
+                {{forgotPassForm.email(class='form-control')}}
+            </div>
+            <div class="mb-3">
+                {{forgotPassForm.submit(class='btn btn-primary')}}
+            </div>
+            <a href="/login">Login</a>
+        </form>
+    </div>
+    {%else%}
+
+<!-- REGISTERATION FORM -->
+
+    <div class="my-forms">
+        {% if session['page'] == 'register' %}
+        <div class="register-form">
+            <h3 class="text-center mb-3">Registeration Form</h3>
+            <form method="POST" id="register-form">
+                {{registerForm.hidden_tag()}}
+                <div class="mb-3">
+                    {{registerForm.email.label(class='form-label')}}
+                    {{registerForm.email(class='form-control')}}
+                </div>
+                <div class='mb-3'>
+                    {{registerForm.name.label(class='form-label')}}
+                    {{registerForm.name(class='form-control')}}
+                </div>
+                <div class='mb-3'>
+                    {{registerForm.password.label(class='form-label')}}
+                    {{registerForm.password(class='form-control',id="password_register")}}
+                </div>
+                <div class='mb-3'>
+                    {{registerForm.pass_confirm.label(class='form-label')}}
+                    {{registerForm.pass_confirm(class='form-control',id="pass_confirm_register")}}
+                </div>
+                <p id="register-error" class="text-danger">
+                    {%if(session['email-exists'])%}
+                    Email Already in Use
+                    {%endif%}
+                </p>
+                <button class='btn btn-primary'>Register</button>
+            </form>
+            <a href="/login">Login</a>
+        </div>
+        <script>
+            const registerForm = document.getElementById('register-form')
+            registerForm.addEventListener('submit',(e)=>{
+                e.preventDefault()
+                const password_register = document.getElementById('password_register')
+                const pass_confirm_register = document.getElementById('pass_confirm_register')
+                if(password_register.value != pass_confirm_register.value){
+                    document.getElementById('register-error').innerText = "Passwords don't match"
+                }else{
+                    registerForm.submit()
+                }
+            })
+        </script>
+ 
+        <!-- LOGIN FORM -->
+
+        {% elif session['page'] == 'login' %}
+        <div class="login-form">
+            <h3 class="text-center mb-3">Login Form</h2>
+            <form method="POST">
+                {{loginForm.hidden_tag()}}
+                <div class="mb-3">
+                    {{loginForm.email.label(class='form-label')}}
+                    {{loginForm.email(class='form-control')}}
+                </div>
+                <div class='mb-3'>
+                    {{loginForm.password.label(class='form-label')}}
+                    {{loginForm.password(class='form-control')}}
+                </div>
+                <p id="login-error" class="text-danger">
+                    {%if(session['invalid-login'])%}
+                    Invalid Login Details
+                    {%endif%}
+                </p>
+                {{loginForm.submit(class='btn btn-primary mb-3')}}
+            </form>
+            <a class="btn btn-dark" href="/forgot">Forgot Password</a>
+            <a class="btn btn-dark" href="/register">Register</a>
+        </div>
+        {%endif%}
+    </div>
+
+
+    <!-- <h2 class="text-center mb-4 mt-3">All Users</h2>
+    <table class="table w-75 mx-auto">
+        <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Password</th>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{user.id}}</td>
+            <td>{{user.name}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.password[:50]}}</td>
+        </tr>
+        {% endfor %}
+    </table> -->
+    {%endif%}
+</div>
+
+<!-- AFTER CLIENT IS LOGGED IN -->
+
+{% else %}
+<style>
+    .radio-form{
+        list-style: none;
+    }
+    .translations{
+        display: flex;
+        /* border-top: 1px solid rgba(0, 0, 0, 0.46);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.46); */
+    }
+    .all-translations{
+        width: 30%;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.114);
+        border-top: 1px solid rgba(0, 0, 0, 0.14);
+        border-left: 2px solid rgba(0, 0, 0, 0.14);
+        border-right: 1px solid rgba(0, 0, 0, 0.14);
+        background-color:#BDBDBD;
+    }
+    .translation{
+        width: 100%;
+        min-height: 100px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.14);
+        cursor: pointer;
+    }
+    .new-translation{
+        width: 70%;
+        border-top: 1px solid rgba(0, 0, 0, 0.14);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.14);
+        min-height: 80vh;
+        position: relative;
+        background-color:#E0E0E0;
+    }
+    .translated-text textarea{
+        min-height: 180px;
+        background-color:#BDBDBD;
+    }
+    .all-heading{
+        border-bottom: 1px solid rgba(0, 0, 0, 0.14);
+        position: relative;
+    }
+    .new-btn{
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    p{
+        margin-block-start:0.4rem ;
+        margin-block-end:0.4rem ;
+    }
+    .form.control {
+    background-color: #757575;
+    } 
+
+    #create-translation input[type=text] {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px blue;
+    width: 47%;
+    }
+
+    .gray50 {
+    background-color: #757575;
+    }
+
+</style>
+
+<div class="d-flex justify-content-between px-4">
+    <p>Welcome {{current_user.name}} | {{current_user.email}}</p>
+    <div>
+    <a style="display: inline;" href="#" class="btn btn-light">TOGGLE LANGUAGE</a>
+    <a style="display: inline;" href="/logout" class="btn btn-primary">LOGOUT</a>
+    </div>
+</div>
+<div class="translations my-4">
+    <div class="all-translations">
+        <div class="all-heading py-2">
+        <p class="text-center"><a href="/create-translation" class="btn btn-outline-dark">New request</a>
+        </p></div>
+        {% for translation in translations[::-1] %}
+        <a href="{{url_for('client.show_translation',id=translation.id)}}" class="text-decoration-none text-black">
+            <div class="translation px-4 py-3">
+                <p><span class="fw-bold">From:</span> {{translation.language_from}} To {{translation.language_to}}</p>
+                <p><span class="fw-bold">Price:</span> ${{translation.price}}</p>
+                <p><span class="fw-bold">Text:</span> {{translation.text[:80]}}...</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    <div class="new-translation p-4">
+
+        <!-- TRANSLATION DETAILS ON RIGHT -->
+
+        {%if session['trans-page']!=None and session['trans-page']!='create'%}
+        <div class="tranlation-details">
+            <p>{{session['trans-page'].text}}</p>
+            {% if session['trans-page'].status %}
+            <p><span class="fw-bold">Status:</span> {{session['trans-page'].status}}</p>
+            {% endif %}
+            <p><span class="fw-bold">Translator:</span> {{session['trans-page'].email or "Not assigned yet"}}</p>
+            <!-- RejectCriteria removed -->
+            {% if session['trans-page'].createdAt %}
+            <p><span class="fw-bold">Created At:</span> {{session['trans-page'].createdAt.strftime('%d %b %Y %H:%M')}}</p>
+            {% endif %}
+            {% if session['trans-page'].acceptedAt %}
+            <p><span class="fw-bold">Accepted At:</span> {{session['trans-page'].acceptedAt.strftime('%d %b %Y %H:%M') or 'Not Accepted Yet'}}</p>
+            {% endif %}
+            {% if session['trans-page'].submittedAt %}
+            <p><span class="fw-bold">Submitted At:</span> {{session['trans-page'].submittedAt.strftime('%d %b %Y %H:%M')}}</p>
+            {% endif %}
+            {% if session['trans-page'].createdAt %}
+            <p><span class="fw-bold">Due by:</span> {{ (session['trans-page'].createdAt).strftime('%d %b %Y %H:%M')}} + {{session['trans-page'].deadline*30}} mins</p>
+            {% endif %}
+            {%if session['trans-page'].onTime!=None %}
+            <p><span class="fw-bold">On time:</span> {{"Yes" if session['trans-page'].onTime else "No"}}</p>
+            {%endif%}
+            {% if session['trans-page'].email or session['trans-page'].translation %}
+            <div class="translated-text">
+                <textarea id="translation-textarea" type="textarea" style="resize: none;" readonly class="form-control" rows="22">{{session['trans-page'].translation or 'No translation yet'}}</textarea>
+                {%if session['trans-page'].translation and not session['trans-page'].rating %}
+                <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='stars.css') }}">
+                    <form action="/rating/{{session['trans-page'].id}}" class="mt-3" method="POST" >
+                        <fieldset class="starability-coinFlip">
+                            <input type="radio" id="no-rate" class="input-no-rate" name="rating" value="0" checked aria-label="No rating." />
+                            <input type="radio" id="first-rate1" name="rating" value="1" />
+                            <label for="first-rate1" title="Terrible">1 star</label>
+                            <input type="radio" id="first-rate2" name="rating" value="2" />
+                            <label for="first-rate2" title="Not good">2 stars</label>
+                            <input type="radio" id="first-rate3" name="rating" value="3" />
+                            <label for="first-rate3" title="Average">3 stars</label>
+                            <input type="radio" id="first-rate4" name="rating" value="4" />
+                            <label for="first-rate4" title="Very good">4 stars</label>
+                            <input type="radio" id="first-rate5" name="rating" value="5" />
+                            <label for="first-rate5" title="Amazing">5 stars</label>
+                        </fieldset>
+                        <button class="btn btn-success mt-2">Submit</button>
+                    </form>
+                {%elif session['trans-page'].translation and session['trans-page'].rating%}
+                <p>Rating: {{session['trans-page'].rating}}</p>
+                {%endif%}
+                </div>
+                <br />
+                <div class="card gray50">
+                    <div class="card-body">
+                    <h5 class="card-title">Need a second look?</h5>
+                    <p> why not try our other service?</p> 
+                    <a href="#" class="btn btn-primary">Link</a>
+                    <p>or email us at office@test.com</p>
+                    </div>
+                </div>
+
+            {%endif%}
+        </div>
+        {%else%}
+
+        <!-- NEW TRANSLATION FORM -->
+      
+
+         <style>
+            .deadline-input{
+                list-style: none;
+            }
+            .glossary-input{
+                width: 100% !important;
+                border: none  !important;
+                border-radius: 0px !important;
+                padding: 2px 3px !important;
+            }
+            .glossary-table-heading{
+                background-color: white;
+                border-left: 2px solid #E0E0E0;
+                text-align: center;
+            }
+        </style>
+        {% if not session['error'] and not session['popup_close'] %}
+        <form action="/create-translation" method="POST" id="create-translation">
+            <div class="mb-3">
+                <label for="translation-text" class="form-label">Source Text</label>
+                <span id="word-count" class="text-secondary ms-2"></span>
+                <textarea name="text" class="form-control" rows="25" id="translation-text" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="target_language" class="form-label">Target Language</label>
+                <select name="target_language" id="target_language" class="form-control" required>
+                    {% for lang in langs %}
+                        <option value="{{lang}}">{{lang}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="" class="form-label">Translation Type</label>
+                <ul class="form-control deadline-input">
+                    <li>
+                        <input type="radio" value="machine" name="translation-type" id="machine-translation" required>
+                        <label for="machine-translation">Machine Translation Only</label>
+                    </li>
+                    <li>
+                        <input type="radio" value="native" name="translation-type" id="natives-translation" required>
+                        <label for="natives-translation">Natives Only</label>
+                    </li>
+                </ul>
+            </div>
+            <div class="mb-3">
+                <p>Deadline</p>
+                <ul class="form-control deadline-input">
+                    {% for i in range(1,5) %}
+                        <li>
+                            <input type="radio" value={{60*i}} id="deadline-{{i}}" name="deadline" required>
+                            <label for="deadline-{{i}}">{{i}} hour</label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="mb-3">
+                <label for="" class="form-label">Add your glossary: </label>
+                <table style="width:100%">
+                    <tr>
+                        <td class="glossary-table-heading" >Source</td>
+                        <td class="glossary-table-heading">+ Target</td>
+                    </tr>
+                    {% for i in range(6) %}
+                        <tr>
+                            <td>
+                                <input type="text" class="glossary-input" name="glossary-source-{{i+1}}">
+                            </td>
+                            <td>
+                                <input type="text" class="glossary-input" name="glossary-target-{{i+1}}">
+                            </td>
+                        </tr>
+                    {% endfor %}                    
+                </table>
+            </div>
+            <div class="mb-3">
+                <button class='btn btn-success'>getPrice</button>
+            </div>
+        </form>
+        {% else %}
+
+        <!-- REFILLED FORM AFTER THE PAGE RELOADS -->
+
+        {% set currTrans = session['error_translation'] %}
+        <form method="post" id="create-translation" action="/create-translation">
+            <div class="mb-3">
+                <label for="translation-text" class="form-label">Source Text</label>
+                <span id="word-count" class="text-secondary ms-2"></span>
+                <textarea name="text" class="form-control" rows="25" id="tranlsation-text" required >{{currTrans['text']}}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="target_language" class="form-label">Target Language</label>
+                <select name="target_language" id="target_language" class="form-control" required>
+                    {% for lang in langs %}
+                        {%set check = 'selected' if currTrans['target_language'] == lang %}
+                        <option value="{{lang}}" {{check}}>{{lang}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="" class="form-label">Translation Type</label>
+                <ul class="form-control deadline-input">
+                    <li>
+                        <input type="radio" value="machine" name="translation-type" id="machine-translation" required {{'checked' if currTrans['translation_type'] == 'machine'}}>
+                        <label for="machine-translation">Machine Translation Only</label>
+                    </li>
+                    <li>
+                        <input type="radio" value="native" name="translation-type" id="natives-translation" required {{'checked' if currTrans['translation_type'] == 'native'}}>
+                        <label for="natives-translation">Natives Only</label>
+                    </li>
+                </ul>
+            </div>
+            <div class="mb-3">
+                <p>Deadline</p>
+                <ul class="form-control deadline-input">
+                    {% for i in range(1,5) %}
+                        <li>
+                            <input type="radio" value={{60*i}} id="deadline-{{i}}" name="deadline" required {{'checked' if currTrans['deadline'] == (60*i)|string }}>
+                            <label for="deadline-{{i}}">{{i}} hour</label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="mb-3">
+                <label for="" class="form-label">Add your glossary: </label>
+                <table style="width:100%">
+                    <tr>
+                        <td class="glossary-table-heading" >Source</td>
+                        <td class="glossary-table-heading">+ Target</td>
+                    </tr>
+                    {% for i in range(6) %}
+                        <tr>
+                            <td>
+                                {%set source=currTrans['glossary_pairs'][i]['source']%}
+                                <input type="text" class="glossary-input" name="glossary-source-{{i+1}}" value='{{source}}'>
+                            </td>
+                            <td>
+                                {%set target=currTrans['glossary_pairs'][i]['target']%}
+                                <input type="text" class="glossary-input" name="glossary-target-{{i+1}}" value='{{target}}'>
+                            </td>
+                        </tr>
+                    {% endfor %}                    
+                </table>
+            </div>
+            <div class="mb-3">
+                <button class='btn btn-success'>getPrice</button>
+            </div>
+            
+        </form>
+        {% endif %}
+        <script>
+            const translationText = document.getElementById('translation-text')
+            translationText.addEventListener('input',()=>{
+                const text = translationText.value;
+                const words = text.split(' ').length
+                wordCount = document.getElementById('word-count')
+                if(words <50){
+                    wordCount.classList.add('text-danger')
+                    wordCount.innerText=`Minimum 50 words required. You wrote ${words} words`
+                }
+                else if(words > 500){
+                    wordCount.classList.add('text-danger')
+                    wordCount.innerText=`Maximum 500 words allowed. You wrote ${words} words`
+                }else{
+                    wordCount.classList.remove('text-danger')
+                    wordCount.innerText = words+" words"
+                }
+            })
+        </script>
+        {% endif %}
+    </div>
+</div>
+
+<!-- POPUP TO ADD PRICE -->
+
+{% if session['popup'] == True %}
+<style>
+    .popup{
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        width: 100vw;
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+    .popup-content{
+        width: 450px;
+        min-height: 300px;
+        background-color: white;
+        z-index: 2;
+        border-radius: 10px;
+    }
+
+    .no-bullet {
+        list-style-type: none;
+    }
+</style>
+<div class="popup">
+    <div class="popup-content p-4">
+        Confirm your details:
+        <form method="POST" id="add_price_form" action="/add-price-form">
+            <ul class="no-bullet">
+            <li>
+                <label for="source-language">Source Language: </label>
+                <select name="source_language" id="source-language">
+                    {% for lang in langs %}
+                        {% if lang != session['popup_trans']['language_to'] %}
+                            <option value="{{lang}}" {{'selected' if session['popup_trans']['language_from'] == lang}}>{{lang}}</option>
+                        {% endif %}                        
+                    {% endfor %}                    
+                </select>
+            </li>
+            <li>Target Language: {{session['popup_trans']['language_to'].capitalize()}}</li>
+            <li><span style='color: red'>Deadline: {{session['deadline_as_time']}} CET </span></li>
+            <li><span style='color: blue'>Excerpt: {{session['popup_trans']['text'][:150]}} ...</span></li>
+            <li>{{session['popup_trans']['words']}} words</li>
+            <li>Avg. TOTAL Price, Candidates: EUR {{session['avg_price']}}</li>
+            <li>Min. TOTAL Price, Candidates: EUR {{session['min_price']}}</li>
+        </ul>
+            <div class="mb-3">
+                <label for="price" class="form-label">Your Price EUR</label>
+                {% if session['error_translation']['translation_type'] == "machine" %}
+                <input type="number" id="price" name="price" class="form-control" value="{{session['min_price']}}" readonly>
+                {%else%}
+                <input type="number" id="price" name="price" class="form-control" min={{session['min_price'] | int | round}}>
+                {% endif %}
+            </div>
+            <p id="error" class="text-danger"></p>
+            <input class="btn btn-success" type="submit" value="Make Request">
+            <a class="btn btn-secondary" href="/remove-popup/{{session['popup_trans']['id']}}">Go back</a>
+        </form>
+    </div>
+</div>
+<!-- <script>
+    const addPriceForm = document.getElementById('add_price_form')
+    addPriceForm.addEventListener('submit',(e)=>{
+        e.preventDefault()
+        const price = document.getElementById('translation-price').value
+        if(price>500 || price <0){
+            document.getElementById('error').innerText="Price must be between 0 and 500"
+        }else{
+            addPriceForm.submit()
+        }
+    })
+</script>
+<script>
+    const textarea = document.getElementById("translation-textarea");
+    autosize(textarea);
+</script> -->
+{%endif%}
+{% endif %}
+
+{% endblock %}
