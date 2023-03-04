@@ -101,7 +101,12 @@ def home():
         translation = Translation.query.get(session['trans-page'].id)
         translation.translation = submitTranslationForm.translation.data 
         translation.submittedAt = datetime.now(timezone('CET'))
-        onTime = (translation.deadline_time + timedelta(minutes=15))>translation.submittedAt
+        #submittedAT is TZ aware, deadlineTime isnt
+        tz = timezone('Europe/Berlin')
+        aware_deadline_time = tz.localize(translation.deadline_time)
+        new_aware_time = aware_deadline_time + timedelta(minutes=15)
+        onTime = new_aware_time>translation.submittedAt
+        
         print(onTime)
         translation.onTime = onTime
         db.session.commit()

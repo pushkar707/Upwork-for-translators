@@ -233,7 +233,7 @@ def makeRequest():
             #FIX GLOSSARY PAIRS
         #             {
         #   "sourceText": "jeweler",
-        #   "translatedText": "Jude",
+        #   "translatedText": "Uhrmacher",
         #   "exact": false
         # }
             

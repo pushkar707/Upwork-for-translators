@@ -24,6 +24,9 @@
         margin: 5px;
     }
 
+    .statusGreen {
+        color: green;
+    }
 </style>
 {% if session['user'] != 'client' %}
 <div class="container">
@@ -226,13 +229,13 @@
         {% for translation in translations[::-1] %}
         <a href="{{url_for('client.show_translation',id=translation.id)}}" class="text-decoration-none text-black">
             <div class="translation px-4 py-3">
-                <p><span class="fw-bold">From:</span> {{translation.language_from}} To {{translation.language_to}}</p>
+                <p><span class="fw-bold">Langauge Pair:</span> {{translation.language_from}} To {{translation.language_to}}</p>
                 <p><span class="fw-bold">Price:</span> ${{translation.price}}</p>
-                <p><span class="fw-bold">Text:</span> {{translation.text[:80]}}...</p>
+                <p><span class="fw-bold">Sample:</span> {{translation.text[:150]}}...</p>
             </div>
         </a>
         {% endfor %}
-    </div>
+    </div><!---end All translations menu left   {% include 'section.html' %} !-->
     <div class="new-translation p-4">
 
         <!-- TRANSLATION DETAILS ON RIGHT -->
@@ -243,7 +246,7 @@
             {% if session['trans-page'].status %}
             <p><span class="fw-bold">Status:</span> {{session['trans-page'].status}}</p>
             {% endif %}
-            <p><span class="fw-bold">Translator:</span> {{session['trans-page'].email or "Not assigned yet"}}</p>
+            <p><span class="fw-bold">Translator:</span> {{session['trans-page'].email or "None/pending"}}</p>
             <!-- RejectCriteria removed -->
             {% if session['trans-page'].createdAt %}
             <p><span class="fw-bold">Created At:</span> {{session['trans-page'].createdAt.strftime('%d %b %Y %H:%M')}}</p>
@@ -290,8 +293,7 @@
                     <div class="card-body">
                     <h5 class="card-title">Need a second look?</h5>
                     <p> why not try our other service?</p> 
-                    <a href="#" class="btn btn-primary">Link</a>
-                    <p>or email us at office@test.com</p>
+                    <a href="/proof" class="btn btn-primary">Link</a>
                     </div>
                 </div>
 
